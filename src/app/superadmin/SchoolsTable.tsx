@@ -1,6 +1,6 @@
 import { adminDb } from "@/lib/firebase/admin";
 import type { School } from "@/lib/types";
-import { formatRwf, calculateAnnualFee, formatRwf } from "@/lib/utils/helpers";
+import { formatRwf, calculateAnnualFee } from "@/lib/utils/helpers";
 import { CheckCircle, XCircle, Clock } from "lucide-react";
 
 interface Props { limit?: number }
