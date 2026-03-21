@@ -27,10 +27,7 @@ export async function POST(request: Request) {
   if (error) return error;
 
   const body = await request.json();
-  const {
-    name, abbreviation, code, email, phone, district,
-    principalName, principalEmail,
-  } = body;
+  const { name, abbreviation, code, email, phone, district, principalName, principalEmail } = body;
 
   if (!name || !abbreviation || !code || !email || !principalEmail || !principalName) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -49,24 +46,24 @@ export async function POST(request: Request) {
   const schoolRef = adminDb.collection("schools").doc();
   await schoolRef.set({
     name,
-    abbreviation:        abbreviation.toUpperCase(),
-    code:                code.padStart(3, "0"),
+    abbreviation:       abbreviation.toUpperCase(),
+    code:               code.padStart(3, "0"),
     email,
-    phone:               phone ?? "",
-    address:             "",
-    district:            district ?? "",
-    province:            "",
-    country:             "Rwanda",
-    planType:            "flat",
-    studentCount:        0,
-    subscriptionStatus:  "trial",
-    subscriptionExpiry:  null,
-    approvedAt:          now,
-    approvedBy:          claims!.uid,
-    isActive:            true,
-    logoUrl:             null,
-    createdAt:           now,
-    updatedAt:           now,
+    phone:              phone ?? "",
+    address:            "",
+    district:           district ?? "",
+    province:           "",
+    country:            "Rwanda",
+    planType:           "flat",
+    studentCount:       0,
+    subscriptionStatus: "trial",
+    subscriptionExpiry: null,
+    approvedAt:         now,
+    approvedBy:         claims!.uid,
+    isActive:           true,
+    logoUrl:            null,
+    createdAt:          now,
+    updatedAt:          now,
   });
 
   // 2. Create principal Firebase Auth user
@@ -94,17 +91,30 @@ export async function POST(request: Request) {
     lastLoginAt: null,
   });
 
-  // 5. Send welcome email
-  await sendPrincipalWelcome({
-    toEmail:       principalEmail,
-    principalName,
-    schoolName:    name,
-    tempPassword,
-  });
+  // 5. Send welcome email — wrapped so it never crashes the response
+  let emailSent  = true;
+  let emailError = "";
+  try {
+    await sendPrincipalWelcome({
+      toEmail:       principalEmail,
+      principalName,
+      schoolName:    name,
+      tempPassword,
+    });
+  } catch (err) {
+    emailSent  = false;
+    emailError = err instanceof Error ? err.message : "Email failed";
+    console.error("Principal welcome email failed:", emailError);
+  }
 
   return NextResponse.json({
-    schoolId:    schoolRef.id,
+    schoolId:     schoolRef.id,
     principalUid: uid,
-    message:     `School created. Welcome email sent to ${principalEmail}`,
+    tempPassword,
+    emailSent,
+    emailError:   emailSent ? null : emailError,
+    message:      emailSent
+      ? `School created. Welcome email sent to ${principalEmail}`
+      : `School created but email failed. Temp password: ${tempPassword}`,
   }, { status: 201 });
 }
