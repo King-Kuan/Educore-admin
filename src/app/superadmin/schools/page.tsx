@@ -8,7 +8,7 @@ import {
   Building2, Users, CreditCard, MoreVertical,
   ExternalLink, ChevronDown,
 } from "lucide-react";
-import { formatRwf, calculateAnnualFee, formatRwf } from "@/lib/utils/helpers";
+import { formatRwf, calculateAnnualFee } from "@/lib/utils/helpers";
 
 interface School {
   id:                 string;
