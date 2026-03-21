@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
 import { requireRole, getSession } from "@/lib/api";
-import { calculateGrade, calculateGrade } from "@/lib/utils/grading";
+import { calculateGrade } from "@/lib/utils/grading";
 import { Timestamp } from "firebase-admin/firestore";
 import { getCurrentAcademicYear, getCurrentTerm } from "@/lib/utils/helpers";
 
