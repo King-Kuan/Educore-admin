@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { formatRwf, calculateAnnualFee, formatRwf } from "@/lib/utils/helpers";
+import { formatRwf, calculateAnnualFee } from "@/lib/utils/helpers";
 import { CreditCard, TrendingUp, AlertCircle, CheckCircle2 } from "lucide-react";
 
 export default function BillingPage() {
