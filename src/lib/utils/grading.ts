@@ -1,4 +1,4 @@
-import type { LetterGrade, DescriptorGrade, GradingResult, GradingType } from "@/lib/types";
+import type { LetterGrade, GradingResult, GradingType } from "@/lib/types";
 
 export const GRADE_SCALE = [
   { grade: "A" as LetterGrade, minPct: 80,  maxPct: 100, descriptor: "Excellent",    value: 6 },
@@ -10,7 +10,11 @@ export const GRADE_SCALE = [
   { grade: "F" as LetterGrade, minPct: 0,   maxPct: 49,  descriptor: "Fail",         value: 0 },
 ];
 
-export function calculateGrade(score: number, maxMarks: number, gradingType: GradingType = "percentage"): GradingResult {
+export function calculateGrade(
+  score: number,
+  maxMarks: number,
+  gradingType: GradingType = "percentage"
+): GradingResult {
   if (maxMarks <= 0) return { grade: "F", descriptor: "Fail", percentage: 0, passed: false, value: 0 };
   if (score < 0) score = 0;
   if (score > maxMarks) score = maxMarks;
@@ -26,15 +30,21 @@ export function calculateGrade(score: number, maxMarks: number, gradingType: Gra
 
   const found = GRADE_SCALE.find((g) => percentage >= g.minPct && percentage <= g.maxPct);
   const entry = found ?? GRADE_SCALE[GRADE_SCALE.length - 1]!;
-  return { grade: entry.grade, descriptor: entry.descriptor, percentage, passed: percentage >= 50, value: entry.value };
+  return {
+    grade:       entry.grade,
+    descriptor:  entry.descriptor,
+    percentage,
+    passed:      percentage >= 50,
+    value:       entry.value,
+  };
+}
+
+export function calculateConductGrade(score: number): GradingResult {
+  return calculateGrade(score, 40);
 }
 
 export function determineDecision(annualPercentage: number) {
-  if (annualPercentage >= 50) return { firstDecision: "promoted",       descriptor: "Promoted"          };
-  if (annualPercentage >= 40) return { firstDecision: "second_sitting", descriptor: "2nd Sitting"       };
-  return                             { firstDecision: "repeat",         descriptor: "Advised to Repeat" };
-}
-
-export function calculateGrade(score: number): GradingResult {
-  return calculateGrade(score, 40);
+  if (annualPercentage >= 50) return { firstDecision: "promoted",       descriptor: "Promoted"           };
+  if (annualPercentage >= 40) return { firstDecision: "second_sitting", descriptor: "2nd Sitting"        };
+  return                             { firstDecision: "repeat",         descriptor: "Advised to Repeat"  };
 }
